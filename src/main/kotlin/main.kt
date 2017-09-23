@@ -16,8 +16,8 @@ val ETW =	"QWERTZUIOASDFGHJKPYXCVBNML"
 val kI =	RotorProperties("JGDQOXUSCAMIFRVTPNEWKBLZYH","N", "kI")
 val kII =	RotorProperties("NTZPSFBOKMWRCJDIVLAEYUXHGQ","E", "kII")
 val kIII =	RotorProperties("JVIUBHTCDYAKEQZPOSGXNRMWFL","Y","kIII")
+val UKW_ROTOR =	RotorProperties("QYHOGNECVPUZTFDJAXWMKISRBL","?","UKV")
 val UKW =	"QYHOGNECVPUZTFDJAXWMKISRBL"
-
 
 data class RotorProperties(val values:String, val notch:String, val name:String)
 
@@ -29,6 +29,7 @@ val rV = RotorProperties("VZBRGITYUPSDNHLXAWMJQOFECK", "Z", "V")
 val rVI = RotorProperties("JPGVOUMFYQBENHZRDKASXLICTW", "ZM", "VI")
 val rVII = RotorProperties("NZJHGRCXMYSWBOUFAIVLPEKQDT", "ZM", "VII")
 val rVIII = RotorProperties("FKQHTLXOCBJSPDZRAMEWNIUYGV", "ZM", "VIII")
+val rBeta = RotorProperties(reflectorBeta, "ZM", "rBeta")
 
 interface IConnector{
     fun input(char:Char):Char
@@ -59,14 +60,15 @@ open class Scrambler(var values:String, var alphabet:String):IScrambler {
     override fun output(char:Char):Char = alphabet[values.indexOf(char)]
     override fun step() = Unit
     override fun rotateInput(char:Char, rotOffset: Int):Char {
-        val rotated = (alphabet.indexOf(char) + rotOffset + 26) % 26
+        var rotated = (alphabet.indexOf(char) + rotOffset) % 26
+        while (rotated < 0){ rotated += 26 }
         return alphabet[rotated]
     }
 }
 
 class Rotor(val props: RotorProperties, alphabet:String):Scrambler(props.values, alphabet){
     var hasRotated = false
-    fun isMovedFromNotchPoint() = hasRotated && isNotchPoint(rotation -1)
+    fun isMovedFromNotchPoint() = hasRotated && isNotchPoint(rotation - 1)
     fun isInNotchPoint() = isNotchPoint(rotation)
 
     private fun isNotchPoint(position:Int):Boolean {

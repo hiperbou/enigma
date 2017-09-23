@@ -58,16 +58,21 @@ class EnigmaMessagesTests {
 
         Message key: JEZA
 
+        Machine Settings for Enigma K Railway
+        Wheel order: 	III I II
+        Ring positions:  	26 17 16 13
+
         QSZVI DVMPN EXACM RWWXU IYOTY NGVVX DZ---
 
         German: Deutsche Truppen sind jetzt in England.
         English: German troops are now in England.
          */
         val plugboard = Plugboard(alphabet, alphabet)
-        val rotor1 = Rotor(rII, alphabet).withKey('E')
-        val rotor2 = Rotor(rI, alphabet).withKey('Z')
-        val rotor3 = Rotor(rIII, alphabet).withKey('A')
-        val reflector = Reflector(reflectorA, alphabet)
+        val rotor0 = Rotor(UKW_ROTOR, alphabet).withInnerRing(26).withKey('J')
+        val rotor1 = Rotor(kIII, alphabet).withInnerRing(17).withKey('E')
+        val rotor2 = Rotor(kI, alphabet).withInnerRing(16).withKey('Z')
+        val rotor3 = Rotor(kII, alphabet).withInnerRing(13).withKey('A')
+        val reflector = Reflector(UKW, alphabet)
         val scramblers =  arrayOf<IScrambler>(plugboard,
                 Connector(plugboard, rotor3),
                 RotateAlways(rotor3),
@@ -75,11 +80,14 @@ class EnigmaMessagesTests {
                 RotateNotchDoubleStep(rotor2,rotor3),
                 Connector(rotor2, rotor1),
                 RotateNotch(rotor1,rotor2),
-                Connector(rotor1, reflector),
-                reflector)
-
+                Connector(rotor1, rotor0),
+                RotateNotch(rotor0,rotor1),
+                Connector(rotor0, plugboard),
+                plugboard
+                //reflector)
+        )
         val decoded = encode("QSZVIDVMPNEXACMRWWXUIYOTYNGVVXDZ", scramblers)
-        assertEquals("", decoded)
+        assertEquals("DEUTSQETRUPPENSINDJETZTINENGLAND", decoded)
     }
 
     @Test
@@ -149,12 +157,13 @@ class EnigmaMessagesTests {
             German: Von Von 'Looks' F T 1132/19 Inhalt: Bei Angriff unter Wasser gedrückt, Wasserbomben. Letzter Gegnerstandort 08:30 Uhr Marine Quadrat AJ9863, 220 Grad, 8sm, stosse nach. 14mb fällt, NNO 4, Sicht 10.
             English: From Looks, radio-telegram 1132/19 contents: Forced to submerge under attack, depth charges. Last enemy location 08:30 hours, sea square AJ9863, following 220 degrees, 8 knots. [Pressure] 14 millibars falling, [wind] north-north-east 4, visibility 10.
          */
-        val plugboardValues = toPlugboard(alphabet, "AV BS CG DL FU HZ IN KM OW RX")
+        val plugboardValues = toPlugboard(alphabet, "AT BL DF GJ HM NW OP QY RZ VX")
         val plugboard = Plugboard(plugboardValues, alphabet)
-        val rotor1 = Rotor(rII, alphabet).withInnerRing(2).withKey('B')
-        val rotor2 = Rotor(rIV, alphabet).withInnerRing(21).withKey('L')
-        val rotor3 = Rotor(rV, alphabet).withInnerRing(12).withKey('A')
-        val reflector = Reflector(reflectorB, alphabet)
+        val rotor0 = Rotor(rBeta, alphabet).withInnerRing(1).withKey('V')
+        val rotor1 = Rotor(rII, alphabet).withInnerRing(1).withKey('J')
+        val rotor2 = Rotor(rIV, alphabet).withInnerRing(1).withKey('N')
+        val rotor3 = Rotor(rI, alphabet).withInnerRing(22).withKey('A')
+        val reflector = Reflector(reflectorBThin, alphabet)
         val scramblers =  arrayOf<IScrambler>(plugboard,
                 Connector(plugboard, rotor3),
                 RotateAlways(rotor3),
@@ -162,13 +171,13 @@ class EnigmaMessagesTests {
                 RotateNotchDoubleStep(rotor2,rotor3),
                 Connector(rotor2, rotor1),
                 RotateNotch(rotor1,rotor2),
-                Connector(rotor1, reflector),
+                Connector(rotor1, rotor0),
+                RotateNotch(rotor0,rotor2),
+                Connector(rotor0, reflector),
                 reflector)
 
         val decoded = encode("NCZWVUSXPNYMINHZXMQXSFWXWLKJAHSHNMCOCCAKUQPMKCSMHKSEINJUSBLKIOSXCKUBHMLLXCSJUSRRDVKOHULXWCCBGVLIYXEOAHXRHKKFVDREWEZLXOBAFGYUJQUKGRTVUKAMEURBVEKSUHHVOYHABCJWMAKLFKLMYFVNRIZRVVRTKOFDANJMOLBGFFLEOPRGTFLVRHOWOPBEKVWMUQFMPWPARMFHAGKXIIBG", scramblers)
         assertEquals("VONVONJLOOKSJHFFTTTEINSEINSDREIZWOYYQNNSNEUNINHALTXXBEIANGRIFFUNTERWASSERGEDRUECKTYWABOSXLETZTERGEGNERSTANDNULACHTDREINULUHRMARQUANTONJOTANEUNACHTSEYHSDREIYZWOZWONULGRADYACHTSMYSTOSSENACHXEKNSVIERMBFAELLTYNNNNNNOOOVIERYSICHTEINSNULL", decoded)
-
-
     }
 
     @Test
