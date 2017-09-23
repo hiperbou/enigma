@@ -11,6 +11,14 @@ val reflectorCThin = "RDOBJNTKVEHMLFCWZAXGYIPSUQ"
 val reflectorBeta = "LEYJVCNIXWPBQMDRTAKZGFUHOS"
 val reflectorGamma = "FSOKANUERHMBTIYCWLQPZXVGJD"
 
+//Enigma K Railway
+val ETW =	"QWERTZUIOASDFGHJKPYXCVBNML"
+val kI =	RotorProperties("JGDQOXUSCAMIFRVTPNEWKBLZYH","N", "kI")
+val kII =	RotorProperties("NTZPSFBOKMWRCJDIVLAEYUXHGQ","E", "kII")
+val kIII =	RotorProperties("JVIUBHTCDYAKEQZPOSGXNRMWFL","Y","kIII")
+val UKW =	"QYHOGNECVPUZTFDJAXWMKISRBL"
+
+
 data class RotorProperties(val values:String, val notch:String, val name:String)
 
 val rI = RotorProperties("EKMFLGDQVZNTOWYHXUSPAIBRCJ", "Q", "I")
@@ -69,6 +77,16 @@ class Rotor(val props: RotorProperties, alphabet:String):Scrambler(props.values,
         hasRotated = true
         rotation++
         rotation %= 26
+    }
+
+    fun withInnerRing(offset:Int):Rotor {
+        innerRingOffset = offset - 1
+        return this
+    }
+
+    fun withKey(char:Char):Rotor {
+        rotation = alphabet.indexOf(char)
+        return this
     }
 }
 class Plugboard(values:String, alphabet:String):Scrambler(values, alphabet)
@@ -137,6 +155,7 @@ fun encode(text:String, scramblers:Array<IScrambler>):String {
 }
 
 fun toPlugboard(alphabet:String, config:String):String{
+    if(config.isEmpty()) return alphabet
     val result = alphabet.toCharArray()
     config.split(" ").forEach{
         val a = result.indexOf(it[0])
