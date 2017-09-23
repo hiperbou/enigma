@@ -3,26 +3,24 @@
  */
 
 val alphabet =      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-//val rIII =        "BDFHJLCPRTXVZNYEIWGAKMUSQO"
-//val rII =         "AJDKSIRUXBLHWTMCQGZNPYFVOE"
-//val rI =          "EKMFLGDQVZNTOWYHXUSPAIBRCJ"
 
 val reflectorA =    "EJMZALYXVBWFCRQUONTSPIKHGD"
 val reflectorB =    "YRUHQSLDPXNGOKMIEBFZCWVJAT"
+val reflectorBThin = "ENKQAUYWJICOPBLMDXZVFTHRGS"
+val reflectorCThin = "RDOBJNTKVEHMLFCWZAXGYIPSUQ"
 val reflectorBeta = "LEYJVCNIXWPBQMDRTAKZGFUHOS"
-val reflectorGamma ="FSOKANUERHMBTIYCWLQPZXVGJD"
-
+val reflectorGamma = "FSOKANUERHMBTIYCWLQPZXVGJD"
 
 data class RotorProperties(val values:String, val notch:String, val name:String)
 
 val rI = RotorProperties("EKMFLGDQVZNTOWYHXUSPAIBRCJ", "Q", "I")
 val rII = RotorProperties("AJDKSIRUXBLHWTMCQGZNPYFVOE", "E", "II")
 val rIII = RotorProperties("BDFHJLCPRTXVZNYEIWGAKMUSQO", "V", "III")
-val rIV = RotorProperties(alphabet, "J", "IV")
-val rV = RotorProperties(alphabet, "Z", "V")
-val rVI = RotorProperties(alphabet, "ZM", "VI")
-val rVII = RotorProperties(alphabet, "ZM", "VII")
-val rVIII = RotorProperties(alphabet, "ZM", "VIII")
+val rIV = RotorProperties("ESOVPZJAYQUIRHXLNFTGKDCMWB", "J", "IV")
+val rV = RotorProperties("VZBRGITYUPSDNHLXAWMJQOFECK", "Z", "V")
+val rVI = RotorProperties("JPGVOUMFYQBENHZRDKASXLICTW", "ZM", "VI")
+val rVII = RotorProperties("NZJHGRCXMYSWBOUFAIVLPEKQDT", "ZM", "VII")
+val rVIII = RotorProperties("FKQHTLXOCBJSPDZRAMEWNIUYGV", "ZM", "VIII")
 
 interface IConnector{
     fun input(char:Char):Char
@@ -31,16 +29,22 @@ interface IConnector{
 
 interface IScrambler:IConnector {
     fun step()
-    var offset:Int
+    var rotation:Int
+    var innerRingOffset:Int
     fun rotateInput(char:Char, rotOffset:Int):Char = char
 }
 
 open class Scrambler(var values:String, var alphabet:String):IScrambler {
-    var _offset = 0
-    override var offset: Int
-        get() = _offset
+    var _innerRingOffset = 0
+    override var innerRingOffset: Int
+        get() = _innerRingOffset
+        set(value) { _innerRingOffset=value }
+
+    var _rotation = 0
+    override var rotation: Int
+        get() = _rotation
         set(value) {
-            _offset = value
+            _rotation = value
         }
 
     override fun input(char:Char):Char = values[alphabet.indexOf(char)]
@@ -54,8 +58,8 @@ open class Scrambler(var values:String, var alphabet:String):IScrambler {
 
 class Rotor(val props: RotorProperties, alphabet:String):Scrambler(props.values, alphabet){
     var hasRotated = false
-    fun isMovedFromNotchPoint() = hasRotated && isNotchPoint(offset-1)
-    fun isInNotchPoint() = isNotchPoint(offset)
+    fun isMovedFromNotchPoint() = hasRotated && isNotchPoint(rotation -1)
+    fun isInNotchPoint() = isNotchPoint(rotation)
 
     private fun isNotchPoint(position:Int):Boolean {
         return props.notch.indexOf(alphabet[(((position)+26)%26)])>=0
@@ -63,8 +67,8 @@ class Rotor(val props: RotorProperties, alphabet:String):Scrambler(props.values,
 
     fun rotate() {
         hasRotated = true
-        offset++
-        offset %= 26
+        rotation++
+        rotation %= 26
     }
 }
 class Plugboard(values:String, alphabet:String):Scrambler(values, alphabet)
@@ -73,9 +77,10 @@ class Reflector(values:String, alphabet:String):Scrambler(values, alphabet){
 }
 
 class Connector(val a:IScrambler, val b:IScrambler):IScrambler{
-    override fun input(char: Char) = b.rotateInput(char, b.offset-a.offset)
-    override fun output(char: Char) = b.rotateInput(char, a.offset-b.offset)
-    override var offset: Int = 0
+    override fun input(char: Char) = b.rotateInput(char, b.rotation - a.rotation -b.innerRingOffset + a.innerRingOffset)
+    override fun output(char: Char) = b.rotateInput(char, a.rotation - b.rotation + b.innerRingOffset - a.innerRingOffset)
+    override var rotation: Int = 0
+    override var innerRingOffset: Int = 0
 
     override fun step() = Unit
     override fun rotateInput(char:Char, rotOffset: Int) = char
@@ -84,11 +89,6 @@ class Connector(val a:IScrambler, val b:IScrambler):IScrambler{
 class RotateAlways(val rotor:Rotor):IScrambler by rotor {
     override fun step() {
         rotor.rotate()
-        ////println("Rotating ${rotor.values}")
-        //rotor.values = rotor.values.drop(1) + rotor.values.first()
-        //rotor.plainValues = rotor.plainValues.drop(1) + rotor.plainValues.first()
-        //rotor.plainValues = rotor.plainValues.last() + rotor.plainValues.dropLast(1)
-        //rotor.values = rotor.values.last() + rotor.values.dropLast(1)
     }
 }
 
@@ -97,7 +97,7 @@ class RotateNever(val rotor:Rotor):IScrambler by rotor {
 }
 
 class RotateFixed(val rotor:Rotor, val rotorOffset:Int):IScrambler by rotor {
-    override fun step() { rotor.offset = rotorOffset }
+    override fun step() { rotor.rotation = rotorOffset }
 }
 
 class RotateNotch(val rotor:Rotor, val otherRotor:Rotor):IScrambler by rotor {
@@ -133,7 +133,7 @@ fun encode(text:String, scramblers:Array<IScrambler>):String {
         scramblers.forEach { it.step() }
         result += encode(it, scramblers)
     }
-    return (result)
+    return result
 }
 
 fun toPlugboard(alphabet:String, config:String):String{
@@ -148,10 +148,8 @@ fun toPlugboard(alphabet:String, config:String):String{
 }
 
 fun main(arg:Array<String>) {
-    //val plugboardValues = alphabet
     val plugboardValues = toPlugboard(alphabet,"AB CD EF GH IJ KL MN OP QR ST")
-
-    val plugboard = Plugboard(plugboardValues, alphabet)
+    val plugboard = Plugboard(alphabet, alphabet)
     val rotor3 = Rotor(rIII, alphabet)
     val rotor2 = Rotor(rII, alphabet)
     val rotor1 = Rotor(rI, alphabet)
@@ -165,22 +163,4 @@ fun main(arg:Array<String>) {
             RotateNotch(rotor1,rotor2),
             Connector(rotor1, reflector),
             reflector)
-    var r = ""
-
-    fun encodeLetters(c:Char):String {
-        var r = ""
-        (1..5).forEach {
-            //println(it)
-            rotor3.offset = it
-            r += encode(c, scramblers)
-        }
-        return r
-    }
-    /*r = encodeLetters('A')
-    println("A ${encodeLetters('A')} = BDZGO") //"BDZGO"
-    println("B ${encodeLetters('B')} = AJLCS") //"AJLCS"
-    println("C ${encodeLetters('C')} = QREBN") //"QREBN"
-    println("D ${encodeLetters('D')} = MAJLI") //"MAJLI"
-*/
-
 }
