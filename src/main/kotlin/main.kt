@@ -13,11 +13,15 @@ val reflectorGamma = "FSOKANUERHMBTIYCWLQPZXVGJD"
 
 //Enigma K Railway
 val ETW =	"QWERTZUIOASDFGHJKPYXCVBNML"
-val kI =	RotorProperties("JGDQOXUSCAMIFRVTPNEWKBLZYH","N", "kI")
-val kII =	RotorProperties("NTZPSFBOKMWRCJDIVLAEYUXHGQ","E", "kII")
-val kIII =	RotorProperties("JVIUBHTCDYAKEQZPOSGXNRMWFL","Y","kIII")
-val UKW_ROTOR =	RotorProperties("QYHOGNECVPUZTFDJAXWMKISRBL","?","UKV")
-val UKW =	"QYHOGNECVPUZTFDJAXWMKISRBL"
+val krI =	RotorProperties("JGDQOXUSCAMIFRVTPNEWKBLZYH","N", "krI")
+val krII =	RotorProperties("NTZPSFBOKMWRCJDIVLAEYUXHGQ","E", "krII")
+val krIII =	RotorProperties("JVIUBHTCDYAKEQZPOSGXNRMWFL","Y","krIII")
+val UKW_KR_ADJUSTABLE_REFLECTOR =	RotorProperties("QYHOGNECVPUZTFDJAXWMKISRBL","?","UKW(Railway)")
+
+//Entry Wheel Wiring
+var ETW_QWERTZ = "JWULCMNOHPQZYXIRADKEGVBTSF" // Enigma K
+var ETW_KZROUQ = "ILXRZTKGJYAMWVDUFCPQEONSHB" // Enigma T
+
 
 data class RotorProperties(val values:String, val notch:String, val name:String)
 
@@ -66,7 +70,7 @@ open class Scrambler(var values:String, var alphabet:String):IScrambler {
     }
 }
 
-class Rotor(val props: RotorProperties, alphabet:String):Scrambler(props.values, alphabet){
+open class Rotor(val props: RotorProperties, alphabet:String):Scrambler(props.values, alphabet){
     var hasRotated = false
     fun isMovedFromNotchPoint() = hasRotated && isNotchPoint(rotation - 1)
     fun isInNotchPoint() = isNotchPoint(rotation)
@@ -92,7 +96,11 @@ class Rotor(val props: RotorProperties, alphabet:String):Scrambler(props.values,
     }
 }
 class Plugboard(values:String, alphabet:String):Scrambler(values, alphabet)
+class EntryWheel(values:String, alphabet:String):Scrambler(values, alphabet)
 class Reflector(values:String, alphabet:String):Scrambler(values, alphabet){
+    override fun output(char:Char):Char = char
+}
+class AdjustableReflector(props: RotorProperties, alphabet:String):Rotor(props, alphabet){
     override fun output(char:Char):Char = char
 }
 

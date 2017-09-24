@@ -61,30 +61,27 @@ class EnigmaMessagesTests {
         Machine Settings for Enigma K Railway
         Wheel order: 	III I II
         Ring positions:  	26 17 16 13
+        Entry Weel Wiring: QWERTZ....
 
         QSZVI DVMPN EXACM RWWXU IYOTY NGVVX DZ---
 
         German: Deutsche Truppen sind jetzt in England.
         English: German troops are now in England.
          */
-        val plugboard = Plugboard(alphabet, alphabet)
-        val rotor0 = Rotor(UKW_ROTOR, alphabet).withInnerRing(26).withKey('J')
-        val rotor1 = Rotor(kIII, alphabet).withInnerRing(17).withKey('E')
-        val rotor2 = Rotor(kI, alphabet).withInnerRing(16).withKey('Z')
-        val rotor3 = Rotor(kII, alphabet).withInnerRing(13).withKey('A')
-        val reflector = Reflector(UKW, alphabet)
-        val scramblers =  arrayOf<IScrambler>(plugboard,
-                Connector(plugboard, rotor3),
+        val entryWheel = EntryWheel(ETW_QWERTZ, alphabet)
+        val rotor0 = AdjustableReflector(UKW_KR_ADJUSTABLE_REFLECTOR, alphabet).withInnerRing(26).withKey('J')
+        val rotor1 = Rotor(krIII, alphabet).withInnerRing(17).withKey('E')
+        val rotor2 = Rotor(krI, alphabet).withInnerRing(16).withKey('Z')
+        val rotor3 = Rotor(krII, alphabet).withInnerRing(13).withKey('A')
+        val scramblers =  arrayOf<IScrambler>(entryWheel,
+                Connector(entryWheel, rotor3),
                 RotateAlways(rotor3),
                 Connector(rotor3, rotor2),
                 RotateNotchDoubleStep(rotor2,rotor3),
                 Connector(rotor2, rotor1),
                 RotateNotch(rotor1,rotor2),
                 Connector(rotor1, rotor0),
-                RotateNotch(rotor0,rotor1),
-                Connector(rotor0, plugboard),
-                plugboard
-                //reflector)
+                rotor0
         )
         val decoded = encode("QSZVIDVMPNEXACMRWWXUIYOTYNGVVXDZ", scramblers)
         assertEquals("DEUTSQETRUPPENSINDJETZTINENGLAND", decoded)
