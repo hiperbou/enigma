@@ -1,12 +1,13 @@
+import com.hiperbou.enigma.*
 import org.junit.Test
 import kotlin.test.assertEquals
-import com.hiperbou.enigma.*
+
 /**
  * Messages and info taken from:
  * http://wiki.franklinheath.co.uk/index.php/Enigma/Sample_Messages
  */
 
-class EnigmaMessagesTests {
+class EnigmaMachinesMessagesTests {
 
     @Test
     fun messageInstructionManualTest() {
@@ -30,23 +31,10 @@ class EnigmaMessagesTests {
         German: Feindliche Infanterie Kolonne beobachtet. Anfang Südausgang Bärwalde. Ende 3km ostwärts Neustadt.
         English: Enemy infantry column was observed. Beginning [at] southern exit [of] Baerwalde. Ending 3km east of Neustadt.
          */
+        val machine = EnigmaM3(reflectorA, rII, rI, rIII, "AM FI NV PS TU WZ")
+                .setInnerRingOffset(24,13,22).setKey("ABL")
 
-        val plugboard = Plugboard("AM FI NV PS TU WZ", alphabet)
-        val rotor1 = Rotor(rII, alphabet).withInnerRing(24).withKey('A')
-        val rotor2 = Rotor(rI, alphabet).withInnerRing(13).withKey('B')
-        val rotor3 = Rotor(rIII, alphabet).withInnerRing(22).withKey('L')
-        val reflector = Reflector(reflectorA, alphabet)
-        val scramblers =  arrayOf<IScrambler>(plugboard,
-                Connector(plugboard, rotor3),
-                RotateAlways(rotor3),
-                Connector(rotor3, rotor2),
-                RotateNotchDoubleStep(rotor2,rotor3),
-                Connector(rotor2, rotor1),
-                RotateNotch(rotor1,rotor2),
-                Connector(rotor1, reflector),
-                reflector)
-
-        val decoded = encode("GCDSEAHUGWTQGRKVLFGXUCALXVYMIGMMNMFDXTGNVHVRMMEVOUYFZSLRHDRRXFJWCFHUHMUNZEFRDISIKBGPMYVXUZ", scramblers)
+        val decoded = machine.encode("GCDSEAHUGWTQGRKVLFGXUCALXVYMIGMMNMFDXTGNVHVRMMEVOUYFZSLRHDRRXFJWCFHUHMUNZEFRDISIKBGPMYVXUZ")
         assertEquals("FEINDLIQEINFANTERIEKOLONNEBEOBAQTETXANFANGSUEDAUSGANGBAERWALDEXENDEDREIKMOSTWAERTSNEUSTADT", decoded)
     }
 
@@ -71,22 +59,10 @@ class EnigmaMessagesTests {
         German: Deutsche Truppen sind jetzt in England.
         English: German troops are now in England.
          */
-        val entryWheel = EntryWheel(ETW_QWERTZ, alphabet)
-        val rotor0 = AdjustableReflector(UKW_KR_ADJUSTABLE_REFLECTOR, alphabet).withInnerRing(26).withKey('J')
-        val rotor1 = Rotor(krIII, alphabet).withInnerRing(17).withKey('E')
-        val rotor2 = Rotor(krI, alphabet).withInnerRing(16).withKey('Z')
-        val rotor3 = Rotor(krII, alphabet).withInnerRing(13).withKey('A')
-        val scramblers =  arrayOf<IScrambler>(entryWheel,
-                Connector(entryWheel, rotor3),
-                RotateAlways(rotor3),
-                Connector(rotor3, rotor2),
-                RotateNotchDoubleStep(rotor2,rotor3),
-                Connector(rotor2, rotor1),
-                RotateNotch(rotor1,rotor2),
-                Connector(rotor1, rotor0),
-                rotor0
-        )
-        val decoded = encode("QSZVIDVMPNEXACMRWWXUIYOTYNGVVXDZ", scramblers)
+        val machine = EnigmaKRailway(krIII, krI, krII)
+                .setInnerRingOffset(26,17,16,13).setKey("JEZA")
+
+        val decoded = machine.encode("QSZVIDVMPNEXACMRWWXUIYOTYNGVVXDZ")
         assertEquals("DEUTSQETRUPPENSINDJETZTINENGLAND", decoded)
     }
 
@@ -106,32 +82,23 @@ class EnigmaMessagesTests {
 
         EDPUD NRGYS ZRCXN UYTPO MRMBO FKTBZ REZKM LXLVE FGUEY SIOZV EQMIK UBPMM YLKLT TDEIS MDICA GYKUA CTCDO MOHWX MUUIA UBSTS LRNBZ SZWNR FXWFY SSXJZ VIJHI DISHP RKLKA YUPAD TXQSP INQMA TLPIF SVKDA SCTAC DPBOP VHJK
 
+        Message key: LSD
+
+        SFBWD NJUSE GQOBH KRTAR EEZMW KPPRB XOHDR OEQGB BGTQV PGVKB VVGBI MHUSZ YDAJQ IROAX SSSNR EHYGG RPISE ZBOVM QIEMM ZCYSG QDGRE RVBIL EKXYQ IRGIR QNRDN VRXCY YTNJR
+
         German: Aufklärung abteilung von Kurtinowa nordwestlich Sebez [auf] Fliegerstraße in Richtung Dubrowki, Opotschka. Um 18:30 Uhr angetreten angriff. Infanterie Regiment 3 geht langsam aber sicher vorwärts. 17:06 Uhr röm eins InfanterieRegiment 3 auf Fliegerstraße mit Anfang 16km ostwärts Kamenec.
         English: Reconnaissance division from Kurtinowa north-west of Sebezh on the flight corridor towards Dubrowki, Opochka. Attack begun at 18:30 hours. Infantry Regiment 3 goes slowly but surely forwards. 17:06 hours [Roman numeral I?] Infantry Regiment 3 on the flight corridor starting 16 km east of Kamenec.
          */
-        val plugboard = Plugboard("AV BS CG DL FU HZ IN KM OW RX", alphabet)
-        val rotor1 = Rotor(rII, alphabet).withInnerRing(2).withKey('B')
-        val rotor2 = Rotor(rIV, alphabet).withInnerRing(21).withKey('L')
-        val rotor3 = Rotor(rV, alphabet).withInnerRing(12).withKey('A')
-        val reflector = Reflector(reflectorB, alphabet)
-        val scramblers =  arrayOf<IScrambler>(plugboard,
-                Connector(plugboard, rotor3),
-                RotateAlways(rotor3),
-                Connector(rotor3, rotor2),
-                RotateNotchDoubleStep(rotor2,rotor3),
-                Connector(rotor2, rotor1),
-                RotateNotch(rotor1,rotor2),
-                Connector(rotor1, reflector),
-                reflector)
 
-        var decoded = encode("EDPUDNRGYSZRCXNUYTPOMRMBOFKTBZREZKMLXLVEFGUEYSIOZVEQMIKUBPMMYLKLTTDEISMDICAGYKUACTCDOMOHWXMUUIAUBSTSLRNBZSZWNRFXWFYSSXJZVIJHIDISHPRKLKAYUPADTXQSPINQMATLPIFSVKDASCTACDPBOPVHJK", scramblers)
+        val machine = EnigmaM3(reflectorB, rII, rIV, rV, "AV BS CG DL FU HZ IN KM OW RX")
+                .setInnerRingOffset(2,21,12).setKey("BLA")
+
+        var decoded = machine.encode("EDPUDNRGYSZRCXNUYTPOMRMBOFKTBZREZKMLXLVEFGUEYSIOZVEQMIKUBPMMYLKLTTDEISMDICAGYKUACTCDOMOHWXMUUIAUBSTSLRNBZSZWNRFXWFYSSXJZVIJHIDISHPRKLKAYUPADTXQSPINQMATLPIFSVKDASCTACDPBOPVHJK")
         assertEquals("AUFKLXABTEILUNGXVONXKURTINOWAXKURTINOWAXNORDWESTLXSEBEZXSEBEZXUAFFLIEGERSTRASZERIQTUNGXDUBROWKIXDUBROWKIXOPOTSCHKAXOPOTSCHKAXUMXEINSAQTDREINULLXUHRANGETRETENXANGRIFFXINFXRGTX", decoded)
 
-        rotor1.withKey('L')
-        rotor2.withKey('S')
-        rotor3.withKey('D')
+        machine.setKey("LSD")
 
-        decoded = encode("SFBWDNJUSEGQOBHKRTAREEZMWKPPRBXOHDROEQGBBGTQVPGVKBVVGBIMHUSZYDAJQIROAXSSSNREHYGGRPISEZBOVMQIEMMZCYSGQDGRERVBILEKXYQIRGIRQNRDNVRXCYYTNJR", scramblers)
+        decoded = machine.encode("SFBWDNJUSEGQOBHKRTAREEZMWKPPRBXOHDROEQGBBGTQVPGVKBVVGBIMHUSZYDAJQIROAXSSSNREHYGGRPISEZBOVMQIEMMZCYSGQDGRERVBILEKXYQIRGIRQNRDNVRXCYYTNJR")
         assertEquals("DREIGEHTLANGSAMABERSIQERVORWAERTSXEINSSIEBENNULLSEQSXUHRXROEMXEINSXINFRGTXDREIXAUFFLIEGERSTRASZEMITANFANGXEINSSEQSXKMXKMXOSTWXKAMENECXK", decoded)
     }
 
@@ -156,25 +123,10 @@ class EnigmaMessagesTests {
             German: Von Von 'Looks' F T 1132/19 Inhalt: Bei Angriff unter Wasser gedrückt, Wasserbomben. Letzter Gegnerstandort 08:30 Uhr Marine Quadrat AJ9863, 220 Grad, 8sm, stosse nach. 14mb fällt, NNO 4, Sicht 10.
             English: From Looks, radio-telegram 1132/19 contents: Forced to submerge under attack, depth charges. Last enemy location 08:30 hours, sea square AJ9863, following 220 degrees, 8 knots. [Pressure] 14 millibars falling, [wind] north-north-east 4, visibility 10.
          */
-        val plugboard = Plugboard("AT BL DF GJ HM NW OP QY RZ VX", alphabet)
-        val rotor0 = Rotor(rBeta, alphabet).withInnerRing(1).withKey('V')
-        val rotor1 = Rotor(rII, alphabet).withInnerRing(1).withKey('J')
-        val rotor2 = Rotor(rIV, alphabet).withInnerRing(1).withKey('N')
-        val rotor3 = Rotor(rI, alphabet).withInnerRing(22).withKey('A')
-        val reflector = Reflector(reflectorBThin, alphabet)
-        val scramblers =  arrayOf<IScrambler>(plugboard,
-                Connector(plugboard, rotor3),
-                RotateAlways(rotor3),
-                Connector(rotor3, rotor2),
-                RotateNotchDoubleStep(rotor2,rotor3),
-                Connector(rotor2, rotor1),
-                RotateNotch(rotor1,rotor2),
-                Connector(rotor1, rotor0),
-                RotateNotch(rotor0,rotor2),
-                Connector(rotor0, reflector),
-                reflector)
+        val machine = EnigmaM4(reflectorBThin, rBeta, rII, rIV, rI, "AT BL DF GJ HM NW OP QY RZ VX")
+                .setInnerRingOffset(1,1,1,22).setKey("VJNA")
 
-        val decoded = encode("NCZWVUSXPNYMINHZXMQXSFWXWLKJAHSHNMCOCCAKUQPMKCSMHKSEINJUSBLKIOSXCKUBHMLLXCSJUSRRDVKOHULXWCCBGVLIYXEOAHXRHKKFVDREWEZLXOBAFGYUJQUKGRTVUKAMEURBVEKSUHHVOYHABCJWMAKLFKLMYFVNRIZRVVRTKOFDANJMOLBGFFLEOPRGTFLVRHOWOPBEKVWMUQFMPWPARMFHAGKXIIBG", scramblers)
+        val decoded = machine.encode("NCZWVUSXPNYMINHZXMQXSFWXWLKJAHSHNMCOCCAKUQPMKCSMHKSEINJUSBLKIOSXCKUBHMLLXCSJUSRRDVKOHULXWCCBGVLIYXEOAHXRHKKFVDREWEZLXOBAFGYUJQUKGRTVUKAMEURBVEKSUHHVOYHABCJWMAKLFKLMYFVNRIZRVVRTKOFDANJMOLBGFFLEOPRGTFLVRHOWOPBEKVWMUQFMPWPARMFHAGKXIIBG")
         assertEquals("VONVONJLOOKSJHFFTTTEINSEINSDREIZWOYYQNNSNEUNINHALTXXBEIANGRIFFUNTERWASSERGEDRUECKTYWABOSXLETZTERGEGNERSTANDNULACHTDREINULUHRMARQUANTONJOTANEUNACHTSEYHSDREIYZWOZWONULGRADYACHTSMYSTOSSENACHXEKNSVIERMBFAELLTYNNNNNNOOOVIERYSICHTEINSNULL", decoded)
     }
 
@@ -196,22 +148,11 @@ class EnigmaMessagesTests {
             German: Steuere Tanafjord an. Standort Quadrat AC4992, fahrt 20sm. Scharnhorst. [hco - padding?]
             English: Heading for Tanafjord. Position is square AC4992, speed 20 knots. Scharnhorst.
          */
-        val plugboard = Plugboard("AN EZ HK IJ LR MQ OT PV SW UX", alphabet)
-        val rotor1 = Rotor(rIII, alphabet).withInnerRing(1).withKey('U')
-        val rotor2 = Rotor(rVI, alphabet).withInnerRing(8).withKey('Z')
-        val rotor3 = Rotor(rVIII, alphabet).withInnerRing(13).withKey('V')
-        val reflector = Reflector(reflectorB, alphabet)
-        val scramblers =  arrayOf<IScrambler>(plugboard,
-                Connector(plugboard, rotor3),
-                RotateAlways(rotor3),
-                Connector(rotor3, rotor2),
-                RotateNotchDoubleStep(rotor2,rotor3),
-                Connector(rotor2, rotor1),
-                RotateNotch(rotor1,rotor2),
-                Connector(rotor1, reflector),
-                reflector)
 
-        val decoded = encode("YKAENZAPMSCHZBFOCUVMRMDPYCOFHADZIZMEFXTHFLOLPZLFGGBOTGOXGRETDWTJIQHLMXVJWKZUASTR", scramblers)
+        val machine = EnigmaM3(reflectorB, rIII, rVI, rVIII, "AN EZ HK IJ LR MQ OT PV SW UX")
+                .setInnerRingOffset(1,8,13).setKey("UZV")
+
+        val decoded = machine.encode("YKAENZAPMSCHZBFOCUVMRMDPYCOFHADZIZMEFXTHFLOLPZLFGGBOTGOXGRETDWTJIQHLMXVJWKZUASTR")
         assertEquals("STEUEREJTANAFJORDJANSTANDORTQUAAACCCVIERNEUNNEUNZWOFAHRTZWONULSMXXSCHARNHORSTHCO", decoded)
     }
 }
