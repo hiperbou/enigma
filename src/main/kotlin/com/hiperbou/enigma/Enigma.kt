@@ -40,6 +40,16 @@ interface IScrambler {
     var innerRingOffset:Int
     fun rotateInput(char:Char, rotOffset:Int):Char = char
 }
+interface IRotor:IScrambler{
+    fun withInnerRing(offset:Int): IRotor
+    fun withKey(char:Char): IRotor
+    fun getKey():Char
+    fun rotate()
+    var hasRotated:Boolean
+    fun isMovedFromNotchPoint():Boolean
+    fun isInNotchPoint():Boolean
+
+}
 
 open class Scrambler(var values:String, var alphabet:String):IScrambler {
     override var innerRingOffset = 0
@@ -55,29 +65,33 @@ open class Scrambler(var values:String, var alphabet:String):IScrambler {
     }
 }
 
-open class Rotor(val props: RotorProperties, alphabet:String):Scrambler(props.values, alphabet){
-    var hasRotated = false
-    fun isMovedFromNotchPoint() = hasRotated && isNotchPoint(rotation - 1)
-    fun isInNotchPoint() = isNotchPoint(rotation)
+open class Rotor(val props: RotorProperties, alphabet:String):IRotor, Scrambler(props.values, alphabet){
+    override var hasRotated = false
+    override fun isMovedFromNotchPoint() = hasRotated && isNotchPoint(rotation - 1)
+    override fun isInNotchPoint() = isNotchPoint(rotation)
 
     private fun isNotchPoint(position:Int):Boolean {
         return props.notch.indexOf(alphabet[(((position)+alphabet.length)%alphabet.length)])>=0
     }
 
-    fun rotate() {
+    override fun rotate() {
         hasRotated = true
         rotation++
         rotation %= alphabet.length
     }
 
-    fun withInnerRing(offset:Int):Rotor {
+    override fun withInnerRing(offset:Int): IRotor {
         innerRingOffset = offset - 1
         return this
     }
 
-    fun withKey(char:Char):Rotor {
+    override fun withKey(char:Char): IRotor {
         rotation = alphabet.indexOf(char)
         return this
+    }
+
+    override fun getKey():Char {
+        return alphabet[rotation]
     }
 }
 
@@ -114,21 +128,21 @@ class Connector(val a:IScrambler, val b:IScrambler):IScrambler{
     override fun rotateInput(char:Char, rotOffset: Int) = char
 }
 
-class RotateAlways(val rotor:Rotor):IScrambler by rotor {
+class RotateAlways(val rotor:IRotor):IRotor by rotor {
     override fun step() {
         rotor.rotate()
     }
 }
 
-class RotateNever(val rotor:Rotor):IScrambler by rotor {
+class RotateNever(val rotor:IRotor):IRotor by rotor {
     override fun step() = Unit
 }
 
-class RotateFixed(val rotor:Rotor, val rotorOffset:Int):IScrambler by rotor {
+class RotateFixed(val rotor:IRotor, val rotorOffset:Int):IRotor by rotor {
     override fun step() { rotor.rotation = rotorOffset }
 }
 
-class RotateNotch(val rotor:Rotor, val otherRotor:Rotor):IScrambler by rotor {
+class RotateNotch(val rotor:IRotor, val otherRotor:IRotor):IRotor by rotor {
     override fun step() {
         rotor.hasRotated = false
         if(otherRotor.isMovedFromNotchPoint()) {
@@ -136,7 +150,7 @@ class RotateNotch(val rotor:Rotor, val otherRotor:Rotor):IScrambler by rotor {
         }
     }
 }
-class RotateNotchDoubleStep(val rotor:Rotor, val otherRotor:Rotor):IScrambler by rotor {
+class RotateNotchDoubleStep(val rotor:IRotor, val otherRotor:IRotor):IRotor by rotor {
     override fun step() {
         rotor.hasRotated = false
         if(otherRotor.isMovedFromNotchPoint()) {

@@ -1,8 +1,8 @@
 package com.hiperbou.enigma
 
 abstract class EnigmaMachine {
-    protected var scramblers = arrayOf<IScrambler>()
-    protected var rotors = arrayOf<Rotor>()
+    abstract val scramblers:Array<IScrambler>
+    abstract val rotors:Array<IRotor>
 
     fun encode(text:String):String {
         return encode(text, scramblers)
@@ -15,7 +15,7 @@ abstract class EnigmaMachine {
     }
 
     fun getRotorsPosition():String {
-        return rotors.map { alphabet[it.rotation] }.joinToString("")
+        return rotors.map { it.getKey() }.joinToString("")
     }
 
     fun setInnerRingOffset(vararg offsets:Int):EnigmaMachine{
@@ -24,77 +24,80 @@ abstract class EnigmaMachine {
     }
 }
 
-class EnigmaM3(reflector: String, rotorLeft: RotorProperties,
-               rotorMiddle: RotorProperties, rotorRight: RotorProperties, plugboardConfig: String = ""):EnigmaMachine(){
-    init{
-        rotors = arrayOf(Rotor(rotorLeft, alphabet),
-                Rotor(rotorMiddle, alphabet),
-                Rotor(rotorRight, alphabet))
-        scramblers = buildMachine(reflector, rotors[0], rotors[1], rotors[2], plugboardConfig)
+class GenericEnigmaMachine(override val scramblers:Array<IScrambler>, override val rotors:Array<IRotor>):EnigmaMachine()
+
+fun EnigmaM3(reflector: String, rotorLeft: RotorProperties,
+              rotorMiddle: RotorProperties, rotorRight: RotorProperties, plugboardConfig: String = ""):EnigmaMachine{
+
+    fun buildMachine(reflector: String, rotorLeft: Rotor, rotorMiddle: Rotor, rotorRight: Rotor, plugboardConfig: String = ""): EnigmaMachine {
+        return MachineBuilder()
+                .add(Plugboard(plugboardConfig, alphabet))
+                .addRotor(RotateAlways(rotorRight))
+                .addRotor(RotateNotchDoubleStep(rotorMiddle,rotorRight))
+                .addRotor(RotateNotch(rotorLeft,rotorMiddle))
+                .addReflector(Reflector(reflector, alphabet))
+                .build()
     }
 
-    private fun buildMachine(reflector: String, rotorLeft: Rotor, rotorMiddle: Rotor, rotorRight: Rotor, plugboardConfig: String = ""): Array<IScrambler> {
-        val plugboard = Plugboard(plugboardConfig, alphabet)
-        val reflector = Reflector(reflector, alphabet)
-        return arrayOf<IScrambler>(plugboard,
-                Connector(plugboard, rotorRight),
-                RotateAlways(rotorRight),
-                Connector(rotorRight, rotorMiddle),
-                RotateNotchDoubleStep(rotorMiddle, rotorRight),
-                Connector(rotorMiddle, rotorLeft),
-                RotateNotch(rotorLeft, rotorMiddle),
-                Connector(rotorLeft, reflector),
-                reflector)
+    return buildMachine(reflector, Rotor(rotorLeft, alphabet),
+            Rotor(rotorMiddle, alphabet), Rotor(rotorRight, alphabet), plugboardConfig)
+}
+
+fun EnigmaM4(reflector: String, rotorThin:RotorProperties, rotorLeft: RotorProperties,
+               rotorMiddle: RotorProperties, rotorRight: RotorProperties, plugboardConfig: String = ""):EnigmaMachine{
+
+    fun buildMachine(reflector: String, rotorThin: Rotor, rotorLeft: Rotor, rotorMiddle: Rotor, rotorRight: Rotor, plugboardConfig: String = ""): EnigmaMachine {
+        return MachineBuilder()
+                .add(Plugboard(plugboardConfig, alphabet))
+                .addRotor(RotateAlways(rotorRight))
+                .addRotor(RotateNotchDoubleStep(rotorMiddle,rotorRight))
+                .addRotor(RotateNotch(rotorLeft,rotorMiddle))
+                .addRotor(RotateNever(rotorThin))
+                .addReflector(Reflector(reflector, alphabet))
+                .build()
+    }
+    return buildMachine(reflector, Rotor(rotorThin, alphabet), Rotor(rotorLeft, alphabet), Rotor(rotorMiddle, alphabet), Rotor(rotorRight, alphabet), plugboardConfig)
+}
+
+fun EnigmaKRailway(rotorLeft: RotorProperties,
+               rotorMiddle: RotorProperties, rotorRight: RotorProperties):EnigmaMachine{
+
+    fun buildMachine(adjustableReflector: Rotor, rotorLeft: Rotor, rotorMiddle: Rotor, rotorRight: Rotor): EnigmaMachine {
+        return MachineBuilder()
+                .add(EntryWheel(ETW_QWERTZ, alphabet))
+                .addRotor(RotateAlways(rotorRight))
+                .addRotor(RotateNotchDoubleStep(rotorMiddle,rotorRight))
+                .addRotor(RotateNotch(rotorLeft,rotorMiddle))
+                .addRotor(RotateNever(adjustableReflector))
+                .build()
+    }
+    return buildMachine(AdjustableReflector(UKW_KR_ADJUSTABLE_REFLECTOR, alphabet), Rotor(rotorLeft, alphabet), Rotor(rotorMiddle, alphabet), Rotor(rotorRight, alphabet))
+}
+
+class MachineBuilder(){
+    private val scramblers = mutableListOf<IScrambler>()
+    private val rotors = mutableListOf<IRotor>()
+    fun add(component:IScrambler):MachineBuilder{
+        scramblers.add(component)
+        return this
+    }
+
+    fun addRotatingComponent(component:IScrambler):MachineBuilder{
+        scramblers.add(Connector(scramblers.last(),component))
+        scramblers.add(component)
+        return this
+    }
+
+    fun addRotor(component:IRotor):MachineBuilder{
+        addRotatingComponent(component)
+        rotors.add(component)
+        return this
+    }
+    fun addReflector(component:IScrambler) = addRotatingComponent(component)
+
+    fun build():EnigmaMachine{
+        return GenericEnigmaMachine(scramblers.toTypedArray(), rotors.reversed().toTypedArray())
     }
 }
 
-class EnigmaM4(reflector: String, rotorThin:RotorProperties, rotorLeft: RotorProperties,
-               rotorMiddle: RotorProperties, rotorRight: RotorProperties, plugboardConfig: String = ""):EnigmaMachine(){
-    init{
-        rotors = arrayOf(Rotor(rotorThin, alphabet),
-                Rotor(rotorLeft, alphabet),
-                Rotor(rotorMiddle, alphabet),
-                Rotor(rotorRight, alphabet))
-        scramblers = buildMachine(reflector, rotors[0], rotors[1], rotors[2], rotors[3], plugboardConfig)
-    }
 
-    private fun buildMachine(reflector: String, rotorThin: Rotor, rotorLeft: Rotor, rotorMiddle: Rotor, rotorRight: Rotor, plugboardConfig: String = ""): Array<IScrambler> {
-        val plugboard = Plugboard(plugboardConfig, alphabet)
-        val reflector = Reflector(reflector, alphabet)
-        return arrayOf<IScrambler>(plugboard,
-                Connector(plugboard, rotorRight),
-                RotateAlways(rotorRight),
-                Connector(rotorRight, rotorMiddle),
-                RotateNotchDoubleStep(rotorMiddle, rotorRight),
-                Connector(rotorMiddle, rotorLeft),
-                RotateNotch(rotorLeft, rotorMiddle),
-                Connector(rotorLeft, rotorThin),
-                RotateNotch(rotorThin, rotorLeft),
-                Connector(rotorThin, reflector),
-                reflector)
-    }
-}
-
-class EnigmaKRailway(rotorLeft: RotorProperties,
-               rotorMiddle: RotorProperties, rotorRight: RotorProperties):EnigmaMachine(){
-    init{
-        rotors = arrayOf(AdjustableReflector(UKW_KR_ADJUSTABLE_REFLECTOR, alphabet),
-                Rotor(rotorLeft, alphabet),
-                Rotor(rotorMiddle, alphabet),
-                Rotor(rotorRight, alphabet))
-        scramblers = buildMachine(rotors[0], rotors[1], rotors[2], rotors[3])
-    }
-
-    private fun buildMachine(adjustableReflector: Rotor, rotorLeft: Rotor, rotorMiddle: Rotor, rotorRight: Rotor): Array<IScrambler> {
-        val entryWheel = EntryWheel(ETW_QWERTZ, alphabet)
-        return arrayOf<IScrambler>(entryWheel,
-                Connector(entryWheel, rotorRight),
-                RotateAlways(rotorRight),
-                Connector(rotorRight, rotorMiddle),
-                RotateNotchDoubleStep(rotorMiddle, rotorRight),
-                Connector(rotorMiddle, rotorLeft),
-                RotateNotch(rotorLeft, rotorMiddle),
-                Connector(rotorLeft, adjustableReflector),
-                RotateNever(adjustableReflector))
-    }
-}
