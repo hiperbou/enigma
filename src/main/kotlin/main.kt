@@ -4,6 +4,10 @@
 
 val alphabet =      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+//Entry Wheel Wiring
+var ETW_QWERTZ = "JWULCMNOHPQZYXIRADKEGVBTSF" // Enigma K
+var ETW_KZROUQ = "ILXRZTKGJYAMWVDUFCPQEONSHB" // Enigma T
+
 val reflectorA =    "EJMZALYXVBWFCRQUONTSPIKHGD"
 val reflectorB =    "YRUHQSLDPXNGOKMIEBFZCWVJAT"
 val reflectorBThin = "ENKQAUYWJICOPBLMDXZVFTHRGS"
@@ -18,11 +22,6 @@ val krII =	RotorProperties("NTZPSFBOKMWRCJDIVLAEYUXHGQ","E", "krII")
 val krIII =	RotorProperties("JVIUBHTCDYAKEQZPOSGXNRMWFL","Y","krIII")
 val UKW_KR_ADJUSTABLE_REFLECTOR =	RotorProperties("QYHOGNECVPUZTFDJAXWMKISRBL","?","UKW(Railway)")
 
-//Entry Wheel Wiring
-var ETW_QWERTZ = "JWULCMNOHPQZYXIRADKEGVBTSF" // Enigma K
-var ETW_KZROUQ = "ILXRZTKGJYAMWVDUFCPQEONSHB" // Enigma T
-
-
 data class RotorProperties(val values:String, val notch:String, val name:String)
 
 val rI = RotorProperties("EKMFLGDQVZNTOWYHXUSPAIBRCJ", "Q", "I")
@@ -35,12 +34,9 @@ val rVII = RotorProperties("NZJHGRCXMYSWBOUFAIVLPEKQDT", "ZM", "VII")
 val rVIII = RotorProperties("FKQHTLXOCBJSPDZRAMEWNIUYGV", "ZM", "VIII")
 val rBeta = RotorProperties(reflectorBeta, "ZM", "rBeta")
 
-interface IConnector{
+interface IScrambler {
     fun input(char:Char):Char
     fun output(char:Char):Char
-}
-
-interface IScrambler:IConnector {
     fun step()
     var rotation:Int
     var innerRingOffset:Int
@@ -48,17 +44,8 @@ interface IScrambler:IConnector {
 }
 
 open class Scrambler(var values:String, var alphabet:String):IScrambler {
-    var _innerRingOffset = 0
-    override var innerRingOffset: Int
-        get() = _innerRingOffset
-        set(value) { _innerRingOffset=value }
-
-    var _rotation = 0
-    override var rotation: Int
-        get() = _rotation
-        set(value) {
-            _rotation = value
-        }
+    override var innerRingOffset = 0
+    override var rotation = 0
 
     override fun input(char:Char):Char = values[alphabet.indexOf(char)]
     override fun output(char:Char):Char = alphabet[values.indexOf(char)]
@@ -95,7 +82,21 @@ open class Rotor(val props: RotorProperties, alphabet:String):Scrambler(props.va
         return this
     }
 }
-class Plugboard(values:String, alphabet:String):Scrambler(values, alphabet)
+class Plugboard(config:String, alphabet:String):Scrambler(toPlugboard(config, alphabet), alphabet){
+    companion object {
+        fun toPlugboard(config:String, alphabet:String):String{
+            if(config.isEmpty()) return alphabet
+            val result = alphabet.toCharArray()
+            config.split(" ").forEach{
+                val a = result.indexOf(it[0])
+                val b = result.indexOf(it[1])
+                result[a] = it[1]
+                result[b] = it[0]
+            }
+            return result.joinToString("")
+        }
+    }
+}
 class EntryWheel(values:String, alphabet:String):Scrambler(values, alphabet)
 class Reflector(values:String, alphabet:String):Scrambler(values, alphabet){
     override fun output(char:Char):Char = char
@@ -164,21 +165,8 @@ fun encode(text:String, scramblers:Array<IScrambler>):String {
     return result
 }
 
-fun toPlugboard(alphabet:String, config:String):String{
-    if(config.isEmpty()) return alphabet
-    val result = alphabet.toCharArray()
-    config.split(" ").forEach{
-        val a = result.indexOf(it[0])
-        val b = result.indexOf(it[1])
-        result[a] = it[1]
-        result[b] = it[0]
-    }
-    return result.joinToString("")
-}
-
 fun main(arg:Array<String>) {
-    val plugboardValues = toPlugboard(alphabet,"AB CD EF GH IJ KL MN OP QR ST")
-    val plugboard = Plugboard(alphabet, alphabet)
+    val plugboard = Plugboard("AB CD EF GH IJ KL MN OP QR ST", alphabet)
     val rotor3 = Rotor(rIII, alphabet)
     val rotor2 = Rotor(rII, alphabet)
     val rotor1 = Rotor(rI, alphabet)

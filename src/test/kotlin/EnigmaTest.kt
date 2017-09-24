@@ -2,8 +2,8 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class EnigmaTests {
-    fun defaultMachine(plugboardValues:String = alphabet): Array<IScrambler> {
-        val plugboard = Plugboard(plugboardValues, alphabet)
+    fun defaultMachine(plugboardConfig:String = ""): Array<IScrambler> {
+        val plugboard = Plugboard(plugboardConfig, alphabet)
         val rotor3 = Rotor(rIII, alphabet)
         val rotor2 = Rotor(rII, alphabet)
         val rotor1 = Rotor(rI, alphabet)
@@ -30,10 +30,10 @@ class EnigmaTests {
 
     @Test
     fun plugboardTest() {
-        val plugboardValues = toPlugboard(alphabet,"AB CD EF GH IJ KL MN OP QR ST")
+        val plugboardConfig = "AB CD EF GH IJ KL MN OP QR ST"
 
-        val encoded = encode("ABCDEFGHIJKLMNOPQRSTUVWXYZ", defaultMachine(plugboardValues))
-        val decoded = encode(encoded, defaultMachine(plugboardValues))
+        val encoded = encode("ABCDEFGHIJKLMNOPQRSTUVWXYZ", defaultMachine(plugboardConfig))
+        val decoded = encode(encoded, defaultMachine(plugboardConfig))
 
         assertEquals("BCIAHMSKJUPDSQCVOGHSSMDENF", encoded)
         assertEquals("ABCDEFGHIJKLMNOPQRSTUVWXYZ", decoded)
@@ -51,7 +51,7 @@ class EnigmaTests {
 
     @Test
     fun doubleStepTest() {
-        val plugboard = Plugboard(alphabet, alphabet)
+        val plugboard = Plugboard("", alphabet)
         val rotor3 = Rotor(rIII, alphabet)
         val rotor2 = Rotor(rII, alphabet)
         val rotor1 = Rotor(rI, alphabet)
@@ -89,7 +89,7 @@ class EnigmaTests {
 
     @Test
     fun innerRingTest() {
-        val plugboard = Plugboard(alphabet, alphabet)
+        val plugboard = Plugboard("", alphabet)
         val rotor3 = Rotor(rIII, alphabet)
         val rotor2 = Rotor(rII, alphabet)
         val rotor1 = Rotor(rI, alphabet)
@@ -112,7 +112,7 @@ class EnigmaTests {
 
     @Test
     fun innerRingTest2() {
-        val plugboard = Plugboard(alphabet, alphabet)
+        val plugboard = Plugboard("", alphabet)
         val rotor3 = Rotor(rIII, alphabet)
         val rotor2 = Rotor(rII, alphabet)
         val rotor1 = Rotor(rI, alphabet)

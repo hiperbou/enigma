@@ -1,6 +1,10 @@
 import org.junit.Test
 import kotlin.test.assertEquals
 
+/**
+ * Messages and info taken from:
+ * http://wiki.franklinheath.co.uk/index.php/Enigma/Sample_Messages
+ */
 
 class EnigmaMessagesTests {
 
@@ -27,8 +31,7 @@ class EnigmaMessagesTests {
         English: Enemy infantry column was observed. Beginning [at] southern exit [of] Baerwalde. Ending 3km east of Neustadt.
          */
 
-        val plugboardValues = toPlugboard(alphabet, "AM FI NV PS TU WZ")
-        val plugboard = Plugboard(plugboardValues, alphabet)
+        val plugboard = Plugboard("AM FI NV PS TU WZ", alphabet)
         val rotor1 = Rotor(rII, alphabet).withInnerRing(24).withKey('A')
         val rotor2 = Rotor(rI, alphabet).withInnerRing(13).withKey('B')
         val rotor3 = Rotor(rIII, alphabet).withInnerRing(22).withKey('L')
@@ -106,8 +109,7 @@ class EnigmaMessagesTests {
         German: Aufklärung abteilung von Kurtinowa nordwestlich Sebez [auf] Fliegerstraße in Richtung Dubrowki, Opotschka. Um 18:30 Uhr angetreten angriff. Infanterie Regiment 3 geht langsam aber sicher vorwärts. 17:06 Uhr röm eins InfanterieRegiment 3 auf Fliegerstraße mit Anfang 16km ostwärts Kamenec.
         English: Reconnaissance division from Kurtinowa north-west of Sebezh on the flight corridor towards Dubrowki, Opochka. Attack begun at 18:30 hours. Infantry Regiment 3 goes slowly but surely forwards. 17:06 hours [Roman numeral I?] Infantry Regiment 3 on the flight corridor starting 16 km east of Kamenec.
          */
-        val plugboardValues = toPlugboard(alphabet, "AV BS CG DL FU HZ IN KM OW RX")
-        val plugboard = Plugboard(plugboardValues, alphabet)
+        val plugboard = Plugboard("AV BS CG DL FU HZ IN KM OW RX", alphabet)
         val rotor1 = Rotor(rII, alphabet).withInnerRing(2).withKey('B')
         val rotor2 = Rotor(rIV, alphabet).withInnerRing(21).withKey('L')
         val rotor3 = Rotor(rV, alphabet).withInnerRing(12).withKey('A')
@@ -154,8 +156,7 @@ class EnigmaMessagesTests {
             German: Von Von 'Looks' F T 1132/19 Inhalt: Bei Angriff unter Wasser gedrückt, Wasserbomben. Letzter Gegnerstandort 08:30 Uhr Marine Quadrat AJ9863, 220 Grad, 8sm, stosse nach. 14mb fällt, NNO 4, Sicht 10.
             English: From Looks, radio-telegram 1132/19 contents: Forced to submerge under attack, depth charges. Last enemy location 08:30 hours, sea square AJ9863, following 220 degrees, 8 knots. [Pressure] 14 millibars falling, [wind] north-north-east 4, visibility 10.
          */
-        val plugboardValues = toPlugboard(alphabet, "AT BL DF GJ HM NW OP QY RZ VX")
-        val plugboard = Plugboard(plugboardValues, alphabet)
+        val plugboard = Plugboard("AT BL DF GJ HM NW OP QY RZ VX", alphabet)
         val rotor0 = Rotor(rBeta, alphabet).withInnerRing(1).withKey('V')
         val rotor1 = Rotor(rII, alphabet).withInnerRing(1).withKey('J')
         val rotor2 = Rotor(rIV, alphabet).withInnerRing(1).withKey('N')
@@ -195,8 +196,7 @@ class EnigmaMessagesTests {
             German: Steuere Tanafjord an. Standort Quadrat AC4992, fahrt 20sm. Scharnhorst. [hco - padding?]
             English: Heading for Tanafjord. Position is square AC4992, speed 20 knots. Scharnhorst.
          */
-        val plugboardValues = toPlugboard(alphabet, "AN EZ HK IJ LR MQ OT PV SW UX")
-        val plugboard = Plugboard(plugboardValues, alphabet)
+        val plugboard = Plugboard("AN EZ HK IJ LR MQ OT PV SW UX", alphabet)
         val rotor1 = Rotor(rIII, alphabet).withInnerRing(1).withKey('U')
         val rotor2 = Rotor(rVI, alphabet).withInnerRing(8).withKey('Z')
         val rotor3 = Rotor(rVIII, alphabet).withInnerRing(13).withKey('V')
