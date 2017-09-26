@@ -19,4 +19,9 @@ class EnigmaMachine(val scramblers:Array<IScrambler>, val rotors:Array<IRotor>) 
         offsets.forEachIndexed { index, i -> rotors[index].withInnerRing(i) }
         return this
     }
+
+    fun setInnerRingOffset(offsets:String):EnigmaMachine{
+        offsets.forEachIndexed { index, i -> rotors[index].withInnerRing(i)}
+        return this
+    }
 }

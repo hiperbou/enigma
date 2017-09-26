@@ -30,7 +30,8 @@ val rV = RotorProperties("VZBRGITYUPSDNHLXAWMJQOFECK", "Z", "V")
 val rVI = RotorProperties("JPGVOUMFYQBENHZRDKASXLICTW", "ZM", "VI")
 val rVII = RotorProperties("NZJHGRCXMYSWBOUFAIVLPEKQDT", "ZM", "VII")
 val rVIII = RotorProperties("FKQHTLXOCBJSPDZRAMEWNIUYGV", "ZM", "VIII")
-val rBeta = RotorProperties(reflectorBeta, "ZM", "rBeta")
+val rBeta = RotorProperties(reflectorBeta, "?", "rBeta")
+val rGamma = RotorProperties(reflectorGamma, "?", "rGamma")
 
 interface IScrambler {
     fun input(char:Char):Char
@@ -42,6 +43,7 @@ interface IScrambler {
 }
 interface IRotor:IScrambler{
     fun withInnerRing(offset:Int): IRotor
+    fun withInnerRing(offset:Char): IRotor
     fun withKey(char:Char): IRotor
     fun getKey():Char
     fun rotate()
@@ -82,6 +84,11 @@ open class Rotor(val props: RotorProperties, alphabet:String):IRotor, Scrambler(
 
     override fun withInnerRing(offset:Int): IRotor {
         innerRingOffset = offset - 1
+        return this
+    }
+
+    override fun withInnerRing(offset:Char): IRotor{
+        innerRingOffset = alphabet.indexOf(offset)
         return this
     }
 
@@ -162,6 +169,7 @@ class RotateNotchDoubleStep(val rotor:IRotor, val otherRotor:IRotor):IRotor by r
 }
 
 fun encode(char:Char, scramblers:Array<IScrambler>):Char {
+    if(char=='.') return char
     var result = char
     scramblers.forEach { result = it.input(result) }
     scramblers.reversed().forEach { result = it.output(result) }
