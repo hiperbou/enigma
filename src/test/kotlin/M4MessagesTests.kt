@@ -1,6 +1,3 @@
-/**
- * Created by Dani on 26/09/17.
- */
 import com.hiperbou.enigma.*
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -34,21 +31,21 @@ class M4MessagesTests {
 
         Interpretation (preliminary):
 
-        KRIEGSNOTMELDUNG [An] Alle:
+        KRIEGSNOTMELDUNG (An) Alle:
 
         Folgendes ist sofort bekanntzugeben:
         Ich habe folgenden Befehl erhalten: "Anstelle des bisherigen Reichsmarschalls "Göring" setzt der Führer Sie, Herr Großadmiral, als seinen Nachfolger ein. Schriftliche Vollmacht unterwegs. Ab sofort sollen Sie sämtliche Maßnahmen verfügen, die sich aus der gegenwärtigen Lage ergeben. Gez. Reichsleiter (Tulpe) "Bormann"":
 
-        [Von] Oberbefehlshaber der Marine, durch Funkstelle des kommandierenden Admirals der Unterseeboote.
+        (Von) Oberbefehlshaber der Marine, durch Funkstelle des kommandierenden Admirals der Unterseeboote.
 
         Translation (preliminary):
 
-        WAR EMERGENCY MESSAGE [To] All:
+        WAR EMERGENCY MESSAGE (To) All:
 
         The following is to be announced immediately:
-        I have received the following order: "In place of former Reichsmarschall "Göring", the Führer has appointed you, Herr Grossadmiral, as his successor. Written authorization [is] on the way. Effective immediately, you are to order all measures that are required by the present situation. Signed, Reichsleiter (Tulpe) "Bormann"":
+        I have received the following order: "In place of former Reichsmarschall "Göring", the Führer has appointed you, Herr Grossadmiral, as his successor. Written authorization (is) on the way. Effective immediately, you are to order all measures that are required by the present situation. Signed, Reichsleiter (Tulpe) "Bormann"":
 
-        [From] Commander-in-Chief of the Navy, [sent] by way of the Radio Station of the Commanding Admiral of Submarines
+        (From) Commander-in-Chief of the Navy, (sent) by way of the Radio Station of the Commanding Admiral of Submarines
 
         Note:
 
@@ -91,20 +88,20 @@ class M4MessagesTests {
 
         Interpretation (preliminary):
 
-        U-Stützpunkt Wesermünde, T.F. [Torpedofangboot] 15 und T.F. 17 von F.d.U. Ost [Verwaltungs? Verbindungs? Verpflegungs?] Offizier:
+        U-Stützpunkt Wesermünde, T.F. (Torpedofangboot) 15 und T.F. 17 von F.d.U. Ost [Verwaltungs? Verbindungs? Verpflegungs?] Offizier:
         Auf dort. F.T. 1549/29 von 29.4:
         1) Von den 50 Tonnen verfügbaren Proviant etwa 30 Tonnen moeglichst vollständige U Bootsausrüstungen zusammenstellen und mit T.F. 15
         nach Helgoland verlagern.
-        2) Restproviant von etwa 20 Tonnen mit T.F. 17 an “Saar” [auf] Rendsburg abgeben.
+        2) Restproviant von etwa 20 Tonnen mit T.F. 17 an “Saar” (auf) Rendsburg abgeben.
         Zusatz für T.F. 15 und T.F. 17: sofort auslaufen nach Wesermuende. Bestätigen.
 
         Translation (preliminary):
 
-        [To] Submarine Base Wesermünde, T.F. [Torpedo Recovery Boat] 15 and T.F. 17 from Comsubs East [Administration? Liaison? Supply?] Officer:
+        (To) Submarine Base Wesermünde, T.F. [Torpedo Recovery Boat] 15 and T.F. 17 from Comsubs East [Administration? Liaison? Supply?] Officer:
         Radiogram thereto, [time-date group] 1549/29 of 29th April:
         1) Of the 50 available tons of provisions, collect about 30 tons of the most complete submarine-outfitting possible and transfer them
         to Helgoland with T.F. 15.
-        2) Deliver the remaining 20 or so tons of provisions with T.F. 17 to “Saar” [at] Rendsburg”. Addition for T.F. 15 and T.F. 17:
+        2) Deliver the remaining 20 or so tons of provisions with T.F. 17 to “Saar” (at) Rendsburg”. Addition for T.F. 15 and T.F. 17:
         Sail for Wesermünde immediately. Acknowledge.
 
         Note: “Saar” was a Flottentender (fleet tender) being used as a barracks ship by F.d.U. East.
@@ -144,14 +141,14 @@ class M4MessagesTests {
         BINEFDUUUAUSBXYVIERXYZWOFUNFXUXZWOUECHSXUUUFLXXHIERVORLIEGENDEKKKRTTBBBEINERMMMSSSFLXZEIGENIMMERWIEDJRSCHLEZHTEFAHRDISZIPLINUUUBOOTEINGELEITENSOWIEBEIALLEINMARSCHGROSSZUEGIGEABWEICHUNGENVONZWGNGSWEGSEIESDURCHFEHLERHAFTENAVIGATIONYGROSSZUGIGEAUSWEICHBEWEGUNGENODERLEICHTFERTIGESABSCHNEIDENBEIKURSAEN.ERUNGENXICHMACHEESDENKOMMANDANTENERNEUTZURPFLICHTEINERSEITSZWANGSWEGEGENAUEINZUHALTENYWOBEIABSTANDVONBOJENSTRICHFUNFNULBISEINSFUNFNULMMMBETRAGENSOLLYANDERSEITSBEMFAHRENIMGELEITDIEVORANTRITTDESMARSCHESBEIMGELEITFUEHRERZUERFRAGENDENBEFEHLEUEBERFAHRWNISEUNDABSTANDVOMGELEITPERSOENLICHINNEZUHALTENXBEIVERSTOESSENYDIEMIRGEMELDETWERDENYBEH.LTEICHMIRSOFORTIGEAB.OESUNG.ESBETRXKOMM.NDANTENVORXXKOMXADMXUUUBOOTEGKDOSVIERZWOZWOZWOBEFXZ
 
         Interpretation (preliminary):
-        SEHR SEHR DRINGEND [An] F.d.U. Ausbildung,[und] 4., 25. und 26. U-Flottillen:
+        SEHR SEHR DRINGEND (An) F.d.U. Ausbildung,(und) 4., 25. und 26. U-Flottillen:
         Hier vorliegende Kriegstagebuch einer Minensuchflottille zeigen immer wieder schlechte Fahrdisziplin U-Boote in Geleiten sowie bei Alleinmarsch: grosszügige Abweichungen von Zwangsweg, sei es durch fehlerhafte Navigation, grosszügige Ausweichbewegungen oder leichtfertiges Abschneiden bei Kursänderungen. Ich mache es den Kommandanten erneut zur Pflicht einerseits Zwangswege genaue inzuhalten, wobei Abstand von Bojenstrich 50 bis 150 Meter betragen soll, anderseits bei Fahren im Geleit die vor Antritt des Marsches beim Geleitführer zu erfragen den Befehle überfahrweise und Abstand vom Geleit persönlich innezuhalten. Bei Verstössen, die mir gemeldet werden, behalte ich mir sofortige Ablösung des betreffenden Kommandanten vor.
-        [Von] Kom. Adm. U-Boote GKdos 4222 Befehl.
+        (Von) Kom. Adm. U-Boote GKdos 4222 Befehl.
 
         Translation (preliminary):
-        EXTREMELY URGENT [To] Comsubs Training, [and] 4th, 25th and 26th Submarine Flotillas:
-        A minesweeper-flotilla’s war diary submitted here shows again and again bad sailing discipline [among] U-boats, in convoy as well as on solo cruise: large-scale deviations from the prescribed route, be it through faulty navigation, large-scale evasive movements or careless shortcuts during course changes. I again make it the responsibility of the commanders, on the one hand to keep exactly to prescribed routes, whereby the distance from the buoy line shall amount to 50 to 150 meters; and on the other hand, while sailing in convoy, to pause before the beginning of the cruise to personally ascertain from the convoy leader the orders regarding crossing and distance from the escort. For any violations reported to me, I reserve to myself [the power to order] the immediate removal of the commander in question.
-        [From] Commanding Admiral of Submarines, Secret Command Matter 4222 Order.
+        EXTREMELY URGENT (To) Comsubs Training, (and) 4th, 25th and 26th Submarine Flotillas:
+        A minesweeper-flotilla’s war diary submitted here shows again and again bad sailing discipline (among) U-boats, in convoy as well as on solo cruise: large-scale deviations from the prescribed route, be it through faulty navigation, large-scale evasive movements or careless shortcuts during course changes. I again make it the responsibility of the commanders, on the one hand to keep exactly to prescribed routes, whereby the distance from the buoy line shall amount to 50 to 150 meters; and on the other hand, while sailing in convoy, to pause before the beginning of the cruise to personally ascertain from the convoy leader the orders regarding crossing and distance from the escort. For any violations reported to me, I reserve to myself [the power to order] the immediate removal of the commander in question.
+        (From) Commanding Admiral of Submarines, Secret Command Matter 4222 Order.
 
         Notes:
         "BINE" (or "BIENE") is one of three codewords that were optionally used as substitutes for the urgency sign "SSD" ("SEHR SEHR DRINGEND" or "EXTREMELY URGENT"). The other two codewords were "MUKE" (or "MUECKE") and "WESPE".
