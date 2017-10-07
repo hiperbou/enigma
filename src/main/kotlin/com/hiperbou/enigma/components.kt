@@ -106,7 +106,7 @@ class Plugboard(config:String, alphabet:String):Scrambler(configToScramblerValue
     companion object {
         private fun configToScramblerValues(config:String, alphabet:String):String{
             if(config.isEmpty()) return alphabet
-            val result = alphabet.toCharArray()
+            val result = alphabet.toMutableList()
             config.split(" ").forEach{
                 val a = result.indexOf(it[0])
                 val b = result.indexOf(it[1])
